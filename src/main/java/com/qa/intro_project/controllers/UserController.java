@@ -1,10 +1,11 @@
 package com.qa.intro_project.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,50 +19,54 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qa.intro_project.data.entity.User;
+import com.qa.intro_project.data.repository.UserRepository;
 
 @RestController
 @RequestMapping(path = "/user") // accepts requests at localhost:8080/user
 public class UserController {
-
-	// the list of users is just pretending to be a database for now
-	private static int COUNTER = 1;
-	private List<User> users = new ArrayList<>(List.of(new User(COUNTER++, "Fred"), new User(COUNTER++, "Sarah")));
+	
+	private UserRepository userRepository;
+	
+	@Autowired // Instructs the Spring IoC container to inject the required dependency
+	public UserController(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 	
 	@GetMapping
 	public ResponseEntity<List<User>> getUsers() {
-		return ResponseEntity.ok(users);
+		return ResponseEntity.ok(userRepository.findAll());
 	}
 	
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<User> getUser(@PathVariable(name = "id") int id) {
-		for (int i = 0; i < users.size(); i++) {
-			User current = this.users.get(i);
-			if (current.getId() == id) {
-				return new ResponseEntity<User>(current, HttpStatus.OK);
-			}
+		Optional<User> user = userRepository.findById(id);
+		
+		if (user.isPresent()) {
+			return new ResponseEntity<User>(user.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping
 	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-		int id = COUNTER++;
-		user.setId(id);
-		users.add(user);
+		User newUser = userRepository.save(user);
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Location", "http://localhost:8080/user/" + id);
+		headers.add("Location", "http://localhost:8080/user/" + newUser.getId());
 
-		return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
+		return new ResponseEntity<User>(newUser, headers, HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}")
 	public User updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
+		// TODO: Implement the update user functionality using the user repository
+		// (HINT) Check if user exists, retrieve user if so, update fields on retrieved user, save retrieved user
 		return null;
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	public User deleteUser(@PathVariable(name = "id") int id) {
+		// TODO: Implement the delete user functionality using the user repository
 		return null;
 	}
 }
