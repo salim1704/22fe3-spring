@@ -3,6 +3,8 @@ package com.qa.intro_project.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,28 +34,18 @@ public class UserController {
 	// - specify a variable in a path by surrounding it in curly braces
 	@GetMapping(path = "/{id}") // localhost:8080/user/3
 	public User getUser(@PathVariable(name = "id") int id) {
-		// we need to get the id out of the path, this can be done with the @PathVariable annotation
-		// - the 'name' attribute takes the name of the path variable
-		// - this then gets the path variable from the path and inserts it into the parameter 'int id'
 		for (int i = 0; i < users.size(); i++) {
 			if (this.users.get(i).getId() == id) {
 				return this.users.get(i);
 			}
 		}
 		return null; // we should return a 404 not found response code
-		
-//		User user = users.stream()
-//						  .filter(u -> u.getId() == id)
-//						  .findFirst()
-//						  .orElse(null);
-//		return user;
 	}
 	
 	// POST
 	@PostMapping // indicates POST requests are accepted at localhost:8080/user
-	public User createUser(@RequestBody User user) {
-		// @RequestBody tells Spring to retrieve the data in the requests body and then create an instance
-		// of User (using the default empty constructor) and then calls its mutators (setters) to set its values
+	public User createUser(@Valid @RequestBody User user) {
+		// The call to 
 		user.setId(COUNTER++);
 		users.add(user);
 		return user;
@@ -62,14 +54,14 @@ public class UserController {
 	// PUT
 	@PutMapping(path = "/{id}")
 	public User updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
-		// TODO: Implement me
+		// TODO: In your implementation, ensure @Valid is called on the request body before updating
 		return null;
 	}
 	
 	// DELETE
 	@DeleteMapping(path = "/{id}")
 	public User deleteUser(@PathVariable(name = "id") int id) {
-		// TODO: Implement me
+		// Your implementation here
 		return null;
 	}
 }
