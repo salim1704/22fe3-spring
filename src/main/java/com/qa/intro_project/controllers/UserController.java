@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.qa.intro_project.data.entity.Post;
 import com.qa.intro_project.data.entity.User;
+import com.qa.intro_project.data.repository.PostRepository;
 import com.qa.intro_project.data.repository.UserRepository;
 
 @RestController
@@ -26,10 +28,12 @@ import com.qa.intro_project.data.repository.UserRepository;
 public class UserController {
 	
 	private UserRepository userRepository;
+	private PostRepository postRepository;
 	
 	@Autowired // Instructs the Spring IoC container to inject the required dependency
-	public UserController(UserRepository userRepository) {
+	public UserController(UserRepository userRepository, PostRepository postRepository) {
 		this.userRepository = userRepository;
+		this.postRepository = postRepository;
 	}
 	
 	@GetMapping
@@ -45,6 +49,14 @@ public class UserController {
 			return new ResponseEntity<User>(user.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+	}
+	
+	@GetMapping(path = "/{id}/posts")
+	public ResponseEntity<List<Post>> getUserPosts(@PathVariable(name = "id") int userId) {
+		Optional<User> user = userRepository.findById(userId);
+		
+		if (user.isPresent()) return ResponseEntity.ok(user.get().getPosts());
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping

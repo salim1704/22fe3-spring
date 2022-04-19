@@ -1,28 +1,31 @@
 package com.qa.intro_project.data.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-// Entities require a spring-data package to be included, this example includes the `spring-data-jpa` module
-// which also transitively includes the `spring-data-jdbc` module and the `hibernate-core` dependency amongst many
-// others. Hibernate is the Object Relational Mapper (ORM) provider which will manage converting our objects from Java
-// to SQL and vice-versa.
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity // JPA annotation marking this as an entity class
-@Table(name = "user") // The optional @Table annotation can be used to specify the table name, a schema and other constraints
+
+@Entity 
+@Table(name = "user")
 public class User {
 
-	@Id // Sets this field as the primary key, required otherwise errors due to no pk
-	@Column(name = "id") // The optional @Column annotation can be used to specify the name and other constraints
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // Auto generate ID values
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@NotNull
@@ -33,16 +36,25 @@ public class User {
 	@NotNull
 	@Email
 	private String email;
+	
+	// @OneToMany signifies a one to many relationship between user and posts where User is the 
+	// parent of the relationship. Post owns the relationship as it stores the id of the user
+	// - mappedBy signifies the name of the field in Post.class which owns the relationship
+	// - targetEntity specifies the class that is being mapped
+	@OneToMany(mappedBy = "user", targetEntity = Post.class, fetch = FetchType.EAGER)
+	@JsonIgnore // stops this field from being serialised or deserialised during a request
+	private List<Post> posts;
 		
-	// JPA requires an empty default constructor, it is ok to have it as protected - Hibernate can still access it
 	protected User() {
 		super();
+		this.posts = new ArrayList<>();
 	}
 	
 	public User(String username, String email) {
 		super();
 		this.username = username;
 		this.email = email;
+		this.posts = new ArrayList<>();
 	}
 
 	public User(int id, String username, String email) {
@@ -50,6 +62,7 @@ public class User {
 		this.id = id;
 		this.username = username;
 		this.email = email;
+		this.posts = new ArrayList<>();
 	}
 
 	public int getId() {
@@ -74,6 +87,14 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public List<Post> getPosts() {
+		return posts;
+	}
+	
+	public void setPosts(List<Post> posts) {
+		this.posts = posts;
 	}
 
 	@Override
