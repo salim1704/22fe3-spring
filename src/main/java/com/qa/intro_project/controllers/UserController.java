@@ -22,60 +22,58 @@ import com.qa.intro_project.data.entity.Post;
 import com.qa.intro_project.data.entity.User;
 import com.qa.intro_project.data.repository.PostRepository;
 import com.qa.intro_project.data.repository.UserRepository;
+import com.qa.intro_project.dto.NewUserDTO;
+import com.qa.intro_project.dto.UserDTO;
+import com.qa.intro_project.service.UserService;
 
 @RestController
 @RequestMapping(path = "/user") // accepts requests at localhost:8080/user
 public class UserController {
 	
-	private UserRepository userRepository;
+	private UserService userService;
 	
 	@Autowired // Instructs the Spring IoC container to inject the required dependency
-	public UserController(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	public UserController(UserService userService) {
+		this.userService = userService;
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<User>> getUsers() {
-		return ResponseEntity.ok(userRepository.findAll());
+	public ResponseEntity<List<UserDTO>> getUsers() {
+		return ResponseEntity.ok(userService.getUsers());
 	}
 	
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<User> getUser(@PathVariable(name = "id") int id) {
-		Optional<User> user = userRepository.findById(id);
-		
-		if (user.isPresent()) {
-			return new ResponseEntity<User>(user.get(), HttpStatus.OK);
-		}
-		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<UserDTO> getUser(@PathVariable(name = "id") int id) {
+		UserDTO user = userService.getUser(id);
+		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/{id}/posts")
 	public ResponseEntity<List<Post>> getUserPosts(@PathVariable(name = "id") int userId) {
-		Optional<User> user = userRepository.findById(userId);
-		
-		if (user.isPresent()) return ResponseEntity.ok(user.get().getPosts());
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		// TODO: 4. Implement this method using a PostDTO (requires task 3 in UserService to be done first)
+		List<Post> posts = userService.getUserPosts(userId);
+		return ResponseEntity.ok(posts);
 	}
 	
 	@PostMapping
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-		User newUser = userRepository.save(user);
+	public ResponseEntity<UserDTO> createUser(@Valid @RequestBody NewUserDTO user) {
+		UserDTO newUser = userService.createUser(user);
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Location", "http://localhost:8080/user/" + newUser.getId());
 
-		return new ResponseEntity<User>(newUser, headers, HttpStatus.CREATED);
+		return new ResponseEntity<>(newUser, headers, HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}")
 	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
-		// TODO: Put your implementation here
+		// TODO: 3. Implement me
 		return null;
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable(name = "id") int id) {
-		// TODO: Put your implementation here
+		// TODO: 4. Implement me
 		return null;
 	}
 }
