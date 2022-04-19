@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,44 +27,55 @@ public class UserController {
 	private static int COUNTER = 1;
 	private List<User> users = new ArrayList<>(List.of(new User(COUNTER++, "Fred"), new User(COUNTER++, "Sarah")));
 	
-	// GET
+	// The return type of each controller method should be wrapped in a 'ResponseEntity' instance,
+	// this allows us to configure the response status, headers and body.
 	@GetMapping
-	public List<User> getUsers() {
-		return users;
+	public ResponseEntity<List<User>> getUsers() {
+		// The static 'ok(body)' method sets the response status to 200 OK and
+		// the body to the specified data, Spring will automatically add a JSON 'Content-type' header
+		return ResponseEntity.ok(users);
 	}
 	
-	// GET by id
-	// - specify a variable in a path by surrounding it in curly braces
-	@GetMapping(path = "/{id}") // localhost:8080/user/3
-	public User getUser(@PathVariable(name = "id") int id) {
+	@GetMapping(path = "/{id}")
+	public ResponseEntity<User> getUser(@PathVariable(name = "id") int id) {
+		// We can also create an instance of a ResponseEntity ourselves
 		for (int i = 0; i < users.size(); i++) {
-			if (this.users.get(i).getId() == id) {
-				return this.users.get(i);
+			User current = this.users.get(i);
+			if (current.getId() == id) {
+				// ResponseEntity(body, HttpStatus) sets the body data and http status respectively
+				return new ResponseEntity<User>(current, HttpStatus.OK);
 			}
 		}
-		return null; // we should return a 404 not found response code
+		// ResponseEntity(HttpStatus) sets the http status
+		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 	}
 	
-	// POST
-	@PostMapping // indicates POST requests are accepted at localhost:8080/user
-	public User createUser(@Valid @RequestBody User user) {
-		// The call to 
-		user.setId(COUNTER++);
+	@PostMapping
+	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+		int id = COUNTER++;
+		user.setId(id);
 		users.add(user);
-		return user;
+		
+		// We can also specify the headers of a response, such as to add the 
+		// 'Location' header of a new resource (the url and path)
+		// First, create an instance of HttpHeaders (the Spring version)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Location", "http://localhost:8080/user/" + id);
+		
+		// We can then create the response and pass the headers to the constructor
+		// - ResponseEntity(body, MultiValueMap, HttpStatus)
+		return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
 	}
 	
-	// PUT
 	@PutMapping(path = "/{id}")
 	public User updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
-		// TODO: In your implementation, ensure @Valid is called on the request body before updating
+		// TODO: Using your implementation of 'updateUser', improve your existing solution by using the ResponseEntity class
 		return null;
 	}
 	
-	// DELETE
 	@DeleteMapping(path = "/{id}")
 	public User deleteUser(@PathVariable(name = "id") int id) {
-		// Your implementation here
+		// TODO: Using your implementation of 'deleteUser', improve your existing solution by using the ResponseEntity class
 		return null;
 	}
 }
