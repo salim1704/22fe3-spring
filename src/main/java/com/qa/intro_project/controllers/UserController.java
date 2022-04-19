@@ -28,12 +28,10 @@ import com.qa.intro_project.data.repository.UserRepository;
 public class UserController {
 	
 	private UserRepository userRepository;
-	private PostRepository postRepository;
 	
 	@Autowired // Instructs the Spring IoC container to inject the required dependency
-	public UserController(UserRepository userRepository, PostRepository postRepository) {
+	public UserController(UserRepository userRepository) {
 		this.userRepository = userRepository;
-		this.postRepository = postRepository;
 	}
 	
 	@GetMapping
@@ -70,15 +68,14 @@ public class UserController {
 	}
 	
 	@PutMapping(path = "/{id}")
-	public User updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
-		// TODO: Implement the update user functionality using the user repository
-		// (HINT) Check if user exists, retrieve user if so, update fields on retrieved user, save retrieved user
+	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
+		// TODO: Put your implementation here
 		return null;
 	}
 	
 	@DeleteMapping(path = "/{id}")
-	public User deleteUser(@PathVariable(name = "id") int id) {
-		// TODO: Implement the delete user functionality using the user repository
+	public ResponseEntity<?> deleteUser(@PathVariable(name = "id") int id) {
+		// TODO: Put your implementation here
 		return null;
 	}
 }
