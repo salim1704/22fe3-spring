@@ -24,6 +24,8 @@ import com.qa.intro_project.data.repository.PostRepository;
 @RestController
 @RequestMapping(path = "/post")
 public class PostController {
+	
+	// TODO: 8. Convert this class to use the post DTOs
 
 	private PostRepository postRepository;
 	

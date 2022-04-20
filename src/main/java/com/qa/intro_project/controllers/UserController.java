@@ -50,7 +50,7 @@ public class UserController {
 	
 	@GetMapping(path = "/{id}/posts")
 	public ResponseEntity<List<Post>> getUserPosts(@PathVariable(name = "id") int userId) {
-		// TODO: 4. Implement this method using a PostDTO (requires task 3 in UserService to be done first)
+		// TODO: 6. Implement this method using a PostDTO (requires task 3 in UserService to be done first)
 		List<Post> posts = userService.getUserPosts(userId);
 		return ResponseEntity.ok(posts);
 	}
@@ -66,7 +66,7 @@ public class UserController {
 	}
 	
 	@PutMapping(path = "/{id}")
-	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
+	public ResponseEntity<UserDTO> updateUser(@RequestBody User user, @PathVariable(name = "id") int id) {
 		// TODO: 3. Implement me
 		return null;
 	}

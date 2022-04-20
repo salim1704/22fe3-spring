@@ -41,7 +41,7 @@ public class UserService {
 		return this.toDTO(user.orElseThrow(() -> new EntityNotFoundException("User not found with id " + id)));
 	}
 	
-	// TODO: 3. Implement PostDTO, convert this method to use it
+	// TODO: 5. Implement PostDTO, convert this method to use it
 	public List<Post> getUserPosts(int userId) {
 		Optional<User> user = userRepository.findById(userId);
 		return user.orElseThrow(() -> new EntityNotFoundException("Posts not found with user id " + userId)).getPosts();
